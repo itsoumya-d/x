@@ -1,14 +1,13 @@
 package com.eraser.recovery.ui.screens.home
 
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -17,6 +16,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,7 +65,7 @@ fun HomeScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = androidx.compose.ui.graphics.Color.Transparent
+                    containerColor = Color.Transparent
                 )
             )
         }
@@ -113,13 +116,7 @@ fun HomeScreen(
 
             PanicButton(
                 onClick = {
-                    val context = androidx.compose.ui.platform.LocalContext.current
-                    val intent = Intent(Intent.ACTION_SENDTO).apply {
-                        data = Uri.parse("mailto:")
-                        putExtra(Intent.EXTRA_EMAIL, arrayOf("support@eraser.com"))
-                        putExtra(Intent.EXTRA_SUBJECT, "I need help")
-                    }
-                    context.startActivity(intent)
+                    // TODO: Implement panic button action
                 }
             )
 

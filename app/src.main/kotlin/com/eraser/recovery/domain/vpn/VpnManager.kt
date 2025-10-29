@@ -117,30 +117,6 @@ class VpnManager @Inject constructor(
         }
     }
 
-    fun updateBlocklist(blockedDomains: List<String>, whitelistedDomains: List<String> = emptyList()) {
-        try {
-            Log.d(TAG, "Updating blocklist: ${blockedDomains.size} blocked, ${whitelistedDomains.size} whitelisted")
-            val intent = Intent(context, CustomVpnService::class.java).apply {
-                action = BlocklistManager.ACTION_UPDATE_BLOCKLIST
-                putExtra(BlocklistManager.EXTRA_BLOCKED_DOMAINS, blockedDomains.toTypedArray())
-                putExtra(BlocklistManager.EXTRA_WHITELISTED_DOMAINS, whitelistedDomains.toTypedArray())
-            }
-            context.startService(intent)
-            Log.d(TAG, "Blocklist updated successfully")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error updating blocklist", e)
-            _vpnError.value = "Failed to update blocklist: ${e.message}"
-        }
-    }
-
-    fun getStatistics(): Map<String, Any>? {
-        return CustomVpnService.getStatistics()
-    }
-
-    fun isServiceRunning(): Boolean {
-        return CustomVpnService.isRunning()
-    }
-
     fun clearError() {
         _vpnError.value = null
     }
