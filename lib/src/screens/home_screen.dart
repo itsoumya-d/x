@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/vpn_service.dart';
+import 'safe_page_screen.dart';
+import 'rewards_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -43,7 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       // Listen to blocked content
       _vpnService.blockedContentStream.listen((blockedContent) {
-        _showBlockedContentDialog(blockedContent);
+        _navigateToSafePage(blockedContent);
       });
     } catch (e) {
       debugPrint('Error initializing VPN: $e');
@@ -84,26 +87,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  void _showBlockedContentDialog(BlockedContent content) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Content Blocked'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Domain: ${content.domain}'),
-            const SizedBox(height: 8),
-            Text('Time: ${content.timestamp.toLocal()}'),
-          ],
+  void _navigateToSafePage(BlockedContent content) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SafePageScreen(
+          domain: content.domain,
+          url: content.url,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
   }
@@ -128,7 +118,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Navigate to settings
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -250,7 +244,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        // Navigate to rewards
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const RewardsScreen(),
+                          ),
+                        );
                       },
                       icon: const Icon(Icons.emoji_events),
                       label: const Text('Rewards'),
@@ -260,7 +258,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        // Navigate to reports
+                        // TODO: Navigate to reports screen
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Reports screen coming soon!'),
+                          ),
+                        );
                       },
                       icon: const Icon(Icons.analytics),
                       label: const Text('Reports'),
