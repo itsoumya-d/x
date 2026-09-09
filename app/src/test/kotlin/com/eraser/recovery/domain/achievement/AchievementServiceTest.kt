@@ -47,7 +47,7 @@ class AchievementServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `getAllAchievements returns flow of achievements`() = runBlocking {
+    fun `getAllAchievements returns flow of achievements`() = runBlocking<Unit> {
         // Given
         val achievements = listOf(
             createAchievement("day_1", "First Step", 1),
@@ -64,7 +64,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `getUnlockedAchievements returns flow of unlocked achievements`() = runBlocking {
+    fun `getUnlockedAchievements returns flow of unlocked achievements`() = runBlocking<Unit> {
         // Given
         val achievements = listOf(
             createAchievement("day_1", "First Step", 1, isUnlocked = true)
@@ -80,7 +80,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `getLockedAchievements returns flow of locked achievements`() = runBlocking {
+    fun `getLockedAchievements returns flow of locked achievements`() = runBlocking<Unit> {
         // Given
         val achievements = listOf(
             createAchievement("day_3", "Three Days", 3, isUnlocked = false)
@@ -96,7 +96,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `getAchievementById returns achievement when found`() = runBlocking {
+    fun `getAchievementById returns achievement when found`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_1", "First Step", 1)
         whenever(achievementDao.getByAchievementId("day_1")).thenReturn(achievement)
@@ -111,7 +111,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `getAchievementById returns null when not found`() = runBlocking {
+    fun `getAchievementById returns null when not found`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getByAchievementId("invalid")).thenReturn(null)
         
@@ -123,7 +123,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `getNextToUnlock returns next locked achievement`() = runBlocking {
+    fun `getNextToUnlock returns next locked achievement`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_3", "Three Days", 3)
         whenever(achievementDao.getNextToUnlock()).thenReturn(achievement)
@@ -141,7 +141,7 @@ class AchievementServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `checkAndUnlockAchievements unlocks achievements based on streak`() = runBlocking {
+    fun `checkAndUnlockAchievements unlocks achievements based on streak`() = runBlocking<Unit> {
         // Given
         val user = createUser(currentStreak = 7)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -176,7 +176,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `checkAndUnlockAchievements does not unlock already unlocked achievements`() = runBlocking {
+    fun `checkAndUnlockAchievements does not unlock already unlocked achievements`() = runBlocking<Unit> {
         // Given
         val user = createUser(currentStreak = 3)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -208,7 +208,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `checkAndUnlockAchievements returns empty list when no user`() = runBlocking {
+    fun `checkAndUnlockAchievements returns empty list when no user`() = runBlocking<Unit> {
         // Given
         whenever(userDao.getUserOnce()).thenReturn(null)
         
@@ -221,7 +221,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `unlockAchievement unlocks specific achievement`() = runBlocking {
+    fun `unlockAchievement unlocks specific achievement`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_1", "First Step", 1, isUnlocked = false)
         whenever(achievementDao.getByAchievementId("day_1")).thenReturn(
@@ -241,7 +241,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `unlockAchievement returns null when achievement not found`() = runBlocking {
+    fun `unlockAchievement returns null when achievement not found`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getByAchievementId("invalid")).thenReturn(null)
         
@@ -254,7 +254,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `unlockAchievement returns null when already unlocked`() = runBlocking {
+    fun `unlockAchievement returns null when already unlocked`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_1", "First Step", 1, isUnlocked = true)
         whenever(achievementDao.getByAchievementId("day_1")).thenReturn(achievement)
@@ -268,7 +268,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `unlockByMilestone unlocks achievement by milestone`() = runBlocking {
+    fun `unlockByMilestone unlocks achievement by milestone`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_7", "One Week", 7, isUnlocked = false)
         whenever(achievementDao.getByMilestone(7)).thenReturn(achievement)
@@ -293,7 +293,7 @@ class AchievementServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `checkFirstIntervention unlocks when completed count is 1 or more`() = runBlocking {
+    fun `checkFirstIntervention unlocks when completed count is 1 or more`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCompletedCount()).thenReturn(1)
         val achievement = createAchievement("first_intervention", "First Intervention", 0, isSpecial = true)
@@ -313,7 +313,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `checkFirstIntervention returns null when no interventions completed`() = runBlocking {
+    fun `checkFirstIntervention returns null when no interventions completed`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCompletedCount()).thenReturn(0)
         
@@ -326,7 +326,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `checkStreakKeeper unlocks when streak is 30 or more`() = runBlocking {
+    fun `checkStreakKeeper unlocks when streak is 30 or more`() = runBlocking<Unit> {
         // Given
         val user = createUser(currentStreak = 30)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -347,7 +347,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `checkStreakKeeper returns null when streak is less than 30`() = runBlocking {
+    fun `checkStreakKeeper returns null when streak is less than 30`() = runBlocking<Unit> {
         // Given
         val user = createUser(currentStreak = 15)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -361,7 +361,7 @@ class AchievementServiceTest {
     }
     
     @Test
-    fun `checkSpecialAchievements checks all special achievements`() = runBlocking {
+    fun `checkSpecialAchievements checks all special achievements`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCompletedCount()).thenReturn(1)
         val user = createUser(currentStreak = 30)
@@ -393,7 +393,7 @@ class AchievementServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     @Test
-    fun `getAchievementProgress returns progress statistics`() = runBlocking {
+    fun `getAchievementProgress returns progress statistics`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(3)
         whenever(achievementDao.getTotalCount()).thenReturn(11)
@@ -416,7 +416,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getAchievementProgress returns zero days until next when milestone reached`() = runBlocking {
+    fun `getAchievementProgress returns zero days until next when milestone reached`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(3)
         whenever(achievementDao.getTotalCount()).thenReturn(11)
@@ -433,7 +433,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getUnlockedCount returns correct count`() = runBlocking {
+    fun `getUnlockedCount returns correct count`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(5)
 
@@ -445,7 +445,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getTotalCount returns correct count`() = runBlocking {
+    fun `getTotalCount returns correct count`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getTotalCount()).thenReturn(11)
 
@@ -457,7 +457,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getProgressPercentage calculates correctly`() = runBlocking {
+    fun `getProgressPercentage calculates correctly`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(5)
         whenever(achievementDao.getTotalCount()).thenReturn(10)
@@ -470,7 +470,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getProgressPercentage returns zero when no achievements`() = runBlocking {
+    fun `getProgressPercentage returns zero when no achievements`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(0)
         whenever(achievementDao.getTotalCount()).thenReturn(0)
@@ -483,7 +483,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `isAchievementUnlocked returns true when unlocked`() = runBlocking {
+    fun `isAchievementUnlocked returns true when unlocked`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_1", "First Step", 1, isUnlocked = true)
         whenever(achievementDao.getByAchievementId("day_1")).thenReturn(achievement)
@@ -496,7 +496,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `isAchievementUnlocked returns false when locked`() = runBlocking {
+    fun `isAchievementUnlocked returns false when locked`() = runBlocking<Unit> {
         // Given
         val achievement = createAchievement("day_1", "First Step", 1, isUnlocked = false)
         whenever(achievementDao.getByAchievementId("day_1")).thenReturn(achievement)
@@ -509,7 +509,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `isAchievementUnlocked returns false when not found`() = runBlocking {
+    fun `isAchievementUnlocked returns false when not found`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getByAchievementId("invalid")).thenReturn(null)
 
@@ -521,7 +521,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getAchievementSummary returns comprehensive summary`() = runBlocking {
+    fun `getAchievementSummary returns comprehensive summary`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(3)
         whenever(achievementDao.getTotalCount()).thenReturn(11)
@@ -544,7 +544,7 @@ class AchievementServiceTest {
     }
 
     @Test
-    fun `getAchievementSummary shows all unlocked when no next achievement`() = runBlocking {
+    fun `getAchievementSummary shows all unlocked when no next achievement`() = runBlocking<Unit> {
         // Given
         whenever(achievementDao.getUnlockedCount()).thenReturn(11)
         whenever(achievementDao.getTotalCount()).thenReturn(11)

@@ -50,7 +50,7 @@ class StatisticsServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `getDashboardStatistics returns comprehensive metrics`() = runBlocking {
+    fun `getDashboardStatistics returns comprehensive metrics`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(currentStreak = 5, longestStreak = 10, totalDaysClean = 15)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -86,7 +86,7 @@ class StatisticsServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `getBlockedAttemptsToday returns correct count`() = runBlocking {
+    fun `getBlockedAttemptsToday returns correct count`() = runBlocking<Unit> {
         // Given
         whenever(blockedAttemptDao.getCountBetween(any(), any())).thenReturn(5)
         
@@ -99,7 +99,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getBlockedAttemptsThisWeek returns correct count`() = runBlocking {
+    fun `getBlockedAttemptsThisWeek returns correct count`() = runBlocking<Unit> {
         // Given
         whenever(blockedAttemptDao.getCountBetween(any(), any())).thenReturn(25)
         
@@ -112,7 +112,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getBlockedAttemptsThisMonth returns correct count`() = runBlocking {
+    fun `getBlockedAttemptsThisMonth returns correct count`() = runBlocking<Unit> {
         // Given
         whenever(blockedAttemptDao.getCountBetween(any(), any())).thenReturn(100)
         
@@ -125,7 +125,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getTopBlockedDomains returns domain counts`() = runBlocking {
+    fun `getTopBlockedDomains returns domain counts`() = runBlocking<Unit> {
         // Given
         val domainCounts = listOf(
             DomainCount("example.com", 50),
@@ -148,7 +148,7 @@ class StatisticsServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `getInterventionCompletionRate calculates correctly`() = runBlocking {
+    fun `getInterventionCompletionRate calculates correctly`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCount()).thenReturn(100)
         whenever(interventionSessionDao.getCompletedCount()).thenReturn(80)
@@ -161,7 +161,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getInterventionCompletionRate returns zero when no interventions`() = runBlocking {
+    fun `getInterventionCompletionRate returns zero when no interventions`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCount()).thenReturn(0)
         whenever(interventionSessionDao.getCompletedCount()).thenReturn(0)
@@ -174,7 +174,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getInterventionSkipRate calculates correctly`() = runBlocking {
+    fun `getInterventionSkipRate calculates correctly`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCount()).thenReturn(100)
         whenever(interventionSessionDao.getSkippedCount()).thenReturn(20)
@@ -187,7 +187,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getAverageInterventionTime returns correct value`() = runBlocking {
+    fun `getAverageInterventionTime returns correct value`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getAverageCompletionTime()).thenReturn(120.0)
         
@@ -199,7 +199,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getInterventionStatistics returns comprehensive metrics`() = runBlocking {
+    fun `getInterventionStatistics returns comprehensive metrics`() = runBlocking<Unit> {
         // Given
         whenever(interventionSessionDao.getCount()).thenReturn(100)
         whenever(interventionSessionDao.getCompletedCount()).thenReturn(80)
@@ -223,7 +223,7 @@ class StatisticsServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `getBlockedAttemptsChartData returns data for 7 days`() = runBlocking {
+    fun `getBlockedAttemptsChartData returns data for 7 days`() = runBlocking<Unit> {
         // Given
         whenever(blockedAttemptDao.getCountBetween(any(), any())).thenReturn(5)
         
@@ -236,7 +236,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getInterventionCompletionChartData returns data for 7 days`() = runBlocking {
+    fun `getInterventionCompletionChartData returns data for 7 days`() = runBlocking<Unit> {
         // Given
         val sessions = listOf(
             createInterventionSession(taskCompleted = true),
@@ -255,7 +255,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getStreakProgressChartData returns data for 30 days`() = runBlocking {
+    fun `getStreakProgressChartData returns data for 30 days`() = runBlocking<Unit> {
         // Given
         val today = LocalDate.now()
         val logs = (0 until 30).map { i ->
@@ -271,7 +271,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getMoodRatingChartData returns data for 30 days`() = runBlocking {
+    fun `getMoodRatingChartData returns data for 30 days`() = runBlocking<Unit> {
         // Given
         val today = LocalDate.now()
         val logs = (0 until 30).map { i ->
@@ -288,7 +288,7 @@ class StatisticsServiceTest {
     }
     
     @Test
-    fun `getTopDomainsPieChartData returns pie chart data`() = runBlocking {
+    fun `getTopDomainsPieChartData returns pie chart data`() = runBlocking<Unit> {
         // Given
         val domainCounts = listOf(
             DomainCount("example.com", 50),
@@ -340,11 +340,11 @@ class StatisticsServiceTest {
     ): DailyLogEntity {
         return DailyLogEntity(
             id = 0,
-            date = date.toEpochDay(),
+            date = date,
             wasClean = wasClean,
             notes = null,
             moodRating = moodRating,
-            triggers = emptyList(),
+            triggers = null,
             createdAt = LocalDateTime.now()
         )
     }
@@ -354,8 +354,9 @@ class StatisticsServiceTest {
             id = 0,
             sessionId = "session_${System.currentTimeMillis()}",
             flashcardId = "flashcard_1",
+            blockedDomain = "example.com",
             blockedUrl = "https://example.com",
-            timestamp = LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC),
+            timestamp = LocalDateTime.now(),
             taskCompleted = taskCompleted,
             taskSkipped = !taskCompleted,
             completionTime = if (taskCompleted) 120 else null,

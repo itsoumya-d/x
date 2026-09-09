@@ -4,11 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.PowerManager
+import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -23,14 +33,18 @@ import kotlin.test.assertTrue
  * Integration tests with actual permissions should be done separately.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [26])
 class OnboardingViewModelTest {
     
     private lateinit var context: Context
     private lateinit var powerManager: PowerManager
     private lateinit var viewModel: OnboardingViewModel
+    private val testDispatcher = StandardTestDispatcher()
     
     @Before
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         context = mock()
         powerManager = mock()
         
@@ -42,6 +56,11 @@ class OnboardingViewModelTest {
         whenever(powerManager.isIgnoringBatteryOptimizations(any())).thenReturn(false)
         
         viewModel = OnboardingViewModel(context)
+    }
+    
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
     
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -185,14 +204,19 @@ class OnboardingViewModelTest {
     
     @Test
     fun `completeOnboarding saves completion state`() = runTest {
-        // Given & When
-        viewModel.completeOnboarding()
-        
+        // Given: a real context so DataStore has a writable location
+        val realContext = ApplicationProvider.getApplicationContext<Context>()
+        val vm = OnboardingViewModel(realContext)
+
+        // When
+        vm.completeOnboarding()
+        advanceUntilIdle()
+
         // Then
         // DataStore operations are async, so we can't easily verify in unit tests
         // This would require instrumentation tests or mocking DataStore
         // Just verify the method doesn't crash
-        assertNotNull(viewModel)
+        assertNotNull(vm)
     }
     
     // ═══════════════════════════════════════════════════════════════════════════════

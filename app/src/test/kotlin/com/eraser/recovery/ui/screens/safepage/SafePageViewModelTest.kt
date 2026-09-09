@@ -3,8 +3,11 @@ package com.eraser.recovery.ui.screens.safepage
 import com.eraser.recovery.data.local.dao.BlockedAttemptDao
 import com.eraser.recovery.data.local.dao.InterventionSessionDao
 import com.eraser.recovery.data.local.entity.BlockedAttemptEntity
+import com.eraser.recovery.data.local.entity.DifficultyLevel
 import com.eraser.recovery.data.local.entity.FlashcardEntity
 import com.eraser.recovery.data.local.entity.InterventionSessionEntity
+import com.eraser.recovery.data.local.entity.MessageCategory
+import com.eraser.recovery.data.local.entity.TaskType
 import com.eraser.recovery.domain.flashcard.FlashcardService
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
@@ -87,16 +90,20 @@ class SafePageViewModelTest {
             flashcardId = "test-1",
             frontMessage = "Test Front",
             backTask = "Test Back",
-            category = "test",
+            taskType = TaskType.REFLECTION,
+            taskDuration = 5,
+            difficultyLevel = DifficultyLevel.EASY,
+            messageCategory = MessageCategory.GOAL_ORIENTED,
             isActive = true
         )
         val testSession = InterventionSessionEntity(
             id = 1L,
+            sessionId = "session-1",
             flashcardId = "test-1",
             blockedDomain = "test.com",
             blockedUrl = "https://test.com",
-            startTime = LocalDateTime.now(),
-            completed = false
+            timestamp = LocalDateTime.now(),
+            taskCompleted = false
         )
         
         coEvery { flashcardService.getRandomFlashcard() } returns testFlashcard
@@ -157,17 +164,18 @@ class SafePageViewModelTest {
     fun `completeTask calls flashcardService and updates blocked attempt`() = runTest {
         val testSession = InterventionSessionEntity(
             id = 1L,
+            sessionId = "session-1",
             flashcardId = "test-1",
             blockedDomain = "test.com",
             blockedUrl = null,
-            startTime = LocalDateTime.now(),
-            completed = false
+            timestamp = LocalDateTime.now(),
+            taskCompleted = false
         )
         val testAttempt = BlockedAttemptEntity(
             id = 123L,
             domain = "test.com",
             url = "https://test.com",
-            timestamp = System.currentTimeMillis(),
+            timestamp = LocalDateTime.now(),
             interventionCompleted = false
         )
         
@@ -209,17 +217,18 @@ class SafePageViewModelTest {
     fun `skipTask calls flashcardService and updates blocked attempt`() = runTest {
         val testSession = InterventionSessionEntity(
             id = 1L,
+            sessionId = "session-1",
             flashcardId = "test-1",
             blockedDomain = "test.com",
             blockedUrl = null,
-            startTime = LocalDateTime.now(),
-            completed = false
+            timestamp = LocalDateTime.now(),
+            taskCompleted = false
         )
         val testAttempt = BlockedAttemptEntity(
             id = 123L,
             domain = "test.com",
             url = "https://test.com",
-            timestamp = System.currentTimeMillis(),
+            timestamp = LocalDateTime.now(),
             interventionCompleted = false
         )
         
@@ -261,11 +270,12 @@ class SafePageViewModelTest {
     fun `exitEarly calls flashcardService when task not completed`() = runTest {
         val testSession = InterventionSessionEntity(
             id = 1L,
+            sessionId = "session-1",
             flashcardId = "test-1",
             blockedDomain = "test.com",
             blockedUrl = null,
-            startTime = LocalDateTime.now(),
-            completed = false
+            timestamp = LocalDateTime.now(),
+            taskCompleted = false
         )
         
         coEvery { flashcardService.getRandomFlashcard() } returns mockk(relaxed = true)
@@ -286,11 +296,12 @@ class SafePageViewModelTest {
     fun `exitEarly does not call flashcardService when task completed`() = runTest {
         val testSession = InterventionSessionEntity(
             id = 1L,
+            sessionId = "session-1",
             flashcardId = "test-1",
             blockedDomain = "test.com",
             blockedUrl = null,
-            startTime = LocalDateTime.now(),
-            completed = false
+            timestamp = LocalDateTime.now(),
+            taskCompleted = false
         )
         
         coEvery { flashcardService.getRandomFlashcard() } returns mockk(relaxed = true)

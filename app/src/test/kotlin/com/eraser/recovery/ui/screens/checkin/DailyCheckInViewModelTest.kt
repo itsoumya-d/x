@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -45,8 +46,8 @@ class DailyCheckInViewModelTest {
         
         coEvery { dailyLogDao.getByDate(any()) } returns null
         coEvery { dailyLogDao.insert(any()) } returns 1L
-        coEvery { journeyService.checkInToday() } returns Unit
-        coEvery { journeyService.recordRelapse() } returns Unit
+        coEvery { journeyService.checkInToday(any(), any()) } returns Result.success(Unit)
+        coEvery { journeyService.recordRelapse(any(), any()) } returns Result.success(Unit)
         coEvery { achievementService.checkAndUnlockAchievements() } returns emptyList()
     }
     
@@ -124,7 +125,7 @@ class DailyCheckInViewModelTest {
         
         // Then
         coVerify { dailyLogDao.insert(match { it.wasClean && it.moodRating == 5 }) }
-        coVerify { journeyService.checkInToday() }
+        coVerify { journeyService.checkInToday(any(), any()) }
         coVerify { achievementService.checkAndUnlockAchievements() }
         assertTrue(viewModel.submitSuccess.value)
     }
@@ -144,7 +145,7 @@ class DailyCheckInViewModelTest {
         
         // Then
         coVerify { dailyLogDao.insert(match { !it.wasClean && it.moodRating == 2 }) }
-        coVerify { journeyService.recordRelapse() }
+        coVerify { journeyService.recordRelapse(any(), any()) }
         coVerify { achievementService.checkAndUnlockAchievements() }
         assertTrue(viewModel.submitSuccess.value)
     }
@@ -221,16 +222,21 @@ class DailyCheckInViewModelTest {
     
     @Test
     fun `isSubmitting is true during submission`() = runTest {
-        // Given
+        // Given: make the insert suspend so the in-flight state is observable
+        coEvery { dailyLogDao.insert(any()) } coAnswers {
+            kotlinx.coroutines.delay(1_000)
+            1L
+        }
         viewModel = DailyCheckInViewModel(dailyLogDao, journeyService, achievementService)
         advanceUntilIdle()
-        
+
         // When
         viewModel.submitCheckIn()
-        
+        runCurrent()
+
         // Then (before advanceUntilIdle)
         assertTrue(viewModel.isSubmitting.value)
-        
+
         // After completion
         advanceUntilIdle()
         assertFalse(viewModel.isSubmitting.value)
