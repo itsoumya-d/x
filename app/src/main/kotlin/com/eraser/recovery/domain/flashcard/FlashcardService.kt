@@ -90,19 +90,19 @@ class FlashcardService @Inject constructor(
             Log.d(TAG, "Total active flashcards: ${allFlashcards.size}")
             
             // Filter out recently shown flashcards to avoid immediate repeats
-            val availableFlashcards = if (recentFlashcardIds.size >= RECENT_HISTORY_SIZE) {
-                allFlashcards.filter { it.flashcardId !in recentFlashcardIds }
-            } else {
-                allFlashcards
-            }
+            val lastShownId = recentFlashcardIds.lastOrNull()
+            val availableFlashcards = allFlashcards.filter { it.flashcardId !in recentFlashcardIds }
             
-            // If all flashcards were recently shown, use all flashcards
-            val selectionPool = if (availableFlashcards.isEmpty()) {
-                Log.d(TAG, "All flashcards recently shown, resetting pool")
-                recentFlashcardIds.clear()
-                allFlashcards
-            } else {
-                availableFlashcards
+            // If every flashcard was recently shown, reset the history but never
+            // repeat the card that was just displayed (unless it is the only one).
+            val selectionPool = when {
+                availableFlashcards.isNotEmpty() -> availableFlashcards
+                allFlashcards.size > 1 -> {
+                    Log.d(TAG, "All flashcards recently shown, resetting pool")
+                    recentFlashcardIds.clear()
+                    allFlashcards.filter { it.flashcardId != lastShownId }
+                }
+                else -> allFlashcards
             }
             
             // Use SecureRandom to select truly random index

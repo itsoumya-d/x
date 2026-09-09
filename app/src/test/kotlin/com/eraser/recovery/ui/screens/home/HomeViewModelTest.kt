@@ -11,6 +11,7 @@ import com.eraser.recovery.domain.vpn.VpnManager
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.After
@@ -58,7 +59,7 @@ class HomeViewModelTest {
         coEvery { blockedAttemptDao.getCountByDate(any()) } returns 0
         coEvery { blockedAttemptDao.getCountBetweenDates(any(), any()) } returns 0
         coEvery { blockedAttemptDao.getTotalCount() } returns 0
-        coEvery { journeyService.isJourneyActive } returns flowOf(false)
+        coEvery { journeyService.isJourneyActive } returns MutableStateFlow(false)
         coEvery { journeyService.startJourney() } returns Result.success(Unit)
         coEvery { journeyService.stopJourney() } returns Result.success(Unit)
     }
@@ -164,7 +165,7 @@ class HomeViewModelTest {
     
     @Test
     fun `observeJourneyState updates protection active`() = runTest {
-        coEvery { journeyService.isJourneyActive } returns flowOf(true)
+        coEvery { journeyService.isJourneyActive } returns MutableStateFlow(true)
         
         viewModel = HomeViewModel(context, userDao, blockedAttemptDao, journeyService, vpnManager)
         advanceUntilIdle()
@@ -174,8 +175,8 @@ class HomeViewModelTest {
     
     @Test
     fun `observeJourneyState handles inactive journey`() = runTest {
-        coEvery { journeyService.isJourneyActive } returns flowOf(false)
-        
+        coEvery { journeyService.isJourneyActive } returns MutableStateFlow(false)
+
         viewModel = HomeViewModel(context, userDao, blockedAttemptDao, journeyService, vpnManager)
         advanceUntilIdle()
         

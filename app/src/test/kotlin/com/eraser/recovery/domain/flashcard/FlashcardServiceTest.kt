@@ -93,7 +93,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getRandomFlashcard returns a flashcard`() = runBlocking {
+    fun `getRandomFlashcard returns a flashcard`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -107,7 +107,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getRandomFlashcard returns different flashcards over multiple calls`() = runBlocking {
+    fun `getRandomFlashcard returns different flashcards over multiple calls`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -125,7 +125,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getRandomFlashcard is not sequential`() = runBlocking {
+    fun `getRandomFlashcard is not sequential`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -147,7 +147,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getRandomFlashcard avoids immediate repeats`() = runBlocking {
+    fun `getRandomFlashcard avoids immediate repeats`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -165,7 +165,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getRandomFlashcard eventually selects all flashcards`() = runBlocking {
+    fun `getRandomFlashcard eventually selects all flashcards`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -182,7 +182,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getShuffledFlashcards returns all flashcards in random order`() = runBlocking {
+    fun `getShuffledFlashcards returns all flashcards in random order`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -202,7 +202,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getShuffledFlashcards produces different orders on multiple calls`() = runBlocking {
+    fun `getShuffledFlashcards produces different orders on multiple calls`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -224,7 +224,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getRandomFlashcard returns null when no flashcards available`() = runBlocking {
+    fun `getRandomFlashcard returns null when no flashcards available`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(emptyList())
         
@@ -236,7 +236,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `clearRecentHistory resets selection pool`() = runBlocking {
+    fun `clearRecentHistory resets selection pool`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getAllActiveList()).thenReturn(testFlashcards)
         
@@ -254,7 +254,7 @@ class FlashcardServiceTest {
     }
     
     @Test
-    fun `getStatistics returns correct data`() = runBlocking {
+    fun `getStatistics returns correct data`() = runBlocking<Unit> {
         // Given
         whenever(flashcardDao.getActiveCount()).thenReturn(60)
         whenever(flashcardDao.getAverageEffectiveness()).thenReturn(75.5)

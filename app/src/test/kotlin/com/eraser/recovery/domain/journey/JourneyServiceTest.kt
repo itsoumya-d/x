@@ -46,10 +46,10 @@ class JourneyServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `startJourney creates user if not exists`() = runBlocking {
+    fun `startJourney creates user if not exists`() = runBlocking<Unit> {
         // Given
         whenever(userDao.getUserOnce()).thenReturn(null)
-        whenever(vpnManager.startVpn()).thenReturn(Result.success(Unit))
+        whenever(vpnManager.startVpn()).thenReturn(true)
         
         // When
         val result = journeyService.startJourney()
@@ -62,7 +62,7 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `startJourney fails if journey already active`() = runBlocking {
+    fun `startJourney fails if journey already active`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(isJourneyActive = true)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -76,11 +76,11 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `startJourney fails if VPN fails to start`() = runBlocking {
+    fun `startJourney fails if VPN fails to start`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(isJourneyActive = false)
         whenever(userDao.getUserOnce()).thenReturn(user)
-        whenever(vpnManager.startVpn()).thenReturn(Result.failure(Exception("VPN error")))
+        whenever(vpnManager.startVpn()).thenReturn(false)
         
         // When
         val result = journeyService.startJourney()
@@ -91,9 +91,9 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `stopJourney stops VPN and updates user`() = runBlocking {
+    fun `stopJourney stops VPN and updates user`() = runBlocking<Unit> {
         // Given
-        whenever(vpnManager.stopVpn()).thenReturn(Result.success(Unit))
+        whenever(vpnManager.stopVpn()).thenReturn(Unit)
         
         // When
         val result = journeyService.stopJourney()
@@ -106,11 +106,11 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `toggleJourney starts journey if stopped`() = runBlocking {
+    fun `toggleJourney starts journey if stopped`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(isJourneyActive = false)
         whenever(userDao.getUserOnce()).thenReturn(user)
-        whenever(vpnManager.startVpn()).thenReturn(Result.success(Unit))
+        whenever(vpnManager.startVpn()).thenReturn(true)
         
         // When
         val result = journeyService.toggleJourney()
@@ -121,11 +121,11 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `toggleJourney stops journey if started`() = runBlocking {
+    fun `toggleJourney stops journey if started`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(isJourneyActive = true)
         whenever(userDao.getUserOnce()).thenReturn(user)
-        whenever(vpnManager.stopVpn()).thenReturn(Result.success(Unit))
+        whenever(vpnManager.stopVpn()).thenReturn(Unit)
         
         // When
         val result = journeyService.toggleJourney()
@@ -140,7 +140,7 @@ class JourneyServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `updateStreak calculates current streak correctly`() = runBlocking {
+    fun `updateStreak calculates current streak correctly`() = runBlocking<Unit> {
         // Given
         val user = createTestUser()
         val today = LocalDate.now()
@@ -159,15 +159,15 @@ class JourneyServiceTest {
         // Then
         assertTrue(result.isSuccess)
         verify(userDao).updateStreak(
-            currentStreak = 3,
-            longestStreak = 3,
+            currentStreak = eq(3),
+            longestStreak = eq(3),
             lastCheckInDate = any(),
             updatedAt = any()
         )
     }
     
     @Test
-    fun `updateStreak handles broken streak`() = runBlocking {
+    fun `updateStreak handles broken streak`() = runBlocking<Unit> {
         // Given
         val user = createTestUser()
         val today = LocalDate.now()
@@ -188,15 +188,15 @@ class JourneyServiceTest {
         // Then
         assertTrue(result.isSuccess)
         verify(userDao).updateStreak(
-            currentStreak = 2, // Only last 2 days
-            longestStreak = 2, // Longest was 2 days
+            currentStreak = eq(2), // Only last 2 days
+            longestStreak = eq(2), // Longest was 2 days
             lastCheckInDate = any(),
             updatedAt = any()
         )
     }
     
     @Test
-    fun `updateStreak calculates longest streak correctly`() = runBlocking {
+    fun `updateStreak calculates longest streak correctly`() = runBlocking<Unit> {
         // Given
         val user = createTestUser()
         val today = LocalDate.now()
@@ -223,15 +223,15 @@ class JourneyServiceTest {
         // Then
         assertTrue(result.isSuccess)
         verify(userDao).updateStreak(
-            currentStreak = 2,
-            longestStreak = 5, // Longest was 5 days
+            currentStreak = eq(2),
+            longestStreak = eq(5), // Longest was 5 days
             lastCheckInDate = any(),
             updatedAt = any()
         )
     }
     
     @Test
-    fun `updateStreak resets to zero with no logs`() = runBlocking {
+    fun `updateStreak resets to zero with no logs`() = runBlocking<Unit> {
         // Given
         val user = createTestUser()
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -243,9 +243,9 @@ class JourneyServiceTest {
         // Then
         assertTrue(result.isSuccess)
         verify(userDao).updateStreak(
-            currentStreak = 0,
-            longestStreak = 0,
-            lastCheckInDate = 0,
+            currentStreak = eq(0),
+            longestStreak = eq(0),
+            lastCheckInDate = eq(0),
             updatedAt = any()
         )
     }
@@ -255,7 +255,7 @@ class JourneyServiceTest {
     // ═══════════════════════════════════════════════════════════════════════════════
     
     @Test
-    fun `checkAndUnlockAchievements unlocks milestone achievements`() = runBlocking {
+    fun `checkAndUnlockAchievements unlocks milestone achievements`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(currentStreak = 7)
         val achievement1 = createAchievement(milestone = 1, isUnlocked = false)
@@ -282,7 +282,7 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `checkAndUnlockAchievements does not unlock already unlocked achievements`() = runBlocking {
+    fun `checkAndUnlockAchievements does not unlock already unlocked achievements`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(currentStreak = 7)
         val achievement1 = createAchievement(milestone = 1, isUnlocked = true)
@@ -308,7 +308,7 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `getNextMilestone returns correct next milestone`() = runBlocking {
+    fun `getNextMilestone returns correct next milestone`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(currentStreak = 5)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -321,7 +321,7 @@ class JourneyServiceTest {
     }
     
     @Test
-    fun `getNextMilestone returns null when all milestones reached`() = runBlocking {
+    fun `getNextMilestone returns null when all milestones reached`() = runBlocking<Unit> {
         // Given
         val user = createTestUser(currentStreak = 365)
         whenever(userDao.getUserOnce()).thenReturn(user)
@@ -362,11 +362,11 @@ class JourneyServiceTest {
     private fun createDailyLog(date: LocalDate, wasClean: Boolean): DailyLogEntity {
         return DailyLogEntity(
             id = 0,
-            date = date.toEpochDay(),
+            date = date,
             wasClean = wasClean,
             notes = null,
             moodRating = null,
-            triggers = emptyList(),
+            triggers = null,
             createdAt = LocalDateTime.now()
         )
     }
